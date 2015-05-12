@@ -10,6 +10,7 @@ Going to be making my notes in this markdown file, plus also maybe throwing some
 2. General Structure of a Compiler
 3. Introduction to Lexical Analysis
 4. Lecture Four: From REs to DFAs
+5. 
 
 ##Lecture One: Introduction
 
@@ -118,7 +119,7 @@ Regular expressions can be expressed as Transitions tables, which lead to determ
 
 Non deterministic finite automaton (NFA) are if one or more transitions exist from one state to another state under the same transition criteria (match). A regular expression is converted to an NFA using the rules described by Thompson's Construction.
 
-####Key ideas for Thompson's Construction are outlined in an image in this Repo.
+####Key ideas for Thompson's Construction are outlined in an image in this Repo (ThompsonsPrincipals.png).
 
 Deterministic finite automaton will describe a transition for every possible input, and will always terminate. Every NFA can be described using a DFA. This is done by isolating the states that create the non deterministic property from the transitions table and constructing a deterministic variant using the **subset construction algorithm**.
 
@@ -168,7 +169,7 @@ As a side note that I thought was kind of interesting while coming up with this 
 
 *IDEA: Make an implementation in python that takes a regular expression from the user, constructs an NFA from this expression, converts this NFA into a DFA and then map this out using networkx and matplotlib python libraries - hopefully I'll have time to do this, because I think this could be pretty fucking cool! Why do I have to revise when I could be spending my time doing cool things? :( Wait a minute... wouldn't that actually be the implementation of a lexical analyser? Will come back to this point soon.. Would also like to point out that these can easily be modelled as directed graphs, states are nodes and transitions are directed edges between nodes which are weighted with value, this value COULD be numerical, since it is possible to map each symbol from the alphabet that makes up the vocabulary of the language to a value (maybe use a hashmap for this), or if netwokx allows, we could simply weight the edges of the directed graph with the symbols themselves...?*
 
-###The Subset Construction Algorithm
+####The Subset Construction Algorithm
 
 The functions 'Move' and 'e-closure' are foundational to the subset construction algorithm, as described below [2]:
 
@@ -179,6 +180,19 @@ The functions 'Move' and 'e-closure' are foundational to the subset construction
 		2. Apply the e-closure to this set of states, possibly resulting in a new set (This set of NFA states will be a single state in the DFA).
 3. Each time we generate a new DFA state, we must apply step 2 to it. The process is complete when applying step 2 does not yield any new states.
 4. The finish states of the DFA are those which contain any of the finish states of the NFA.
+
+*implementing this is defiantly do-able, but it might take a bit of time, I'm not sure if I've got the time to do this atm..*
+
+##Lecture Five: DFA Minimisation
+
+If a DFA has the property where there exists two or more states whose transitions are found to be equivalent, as long as both are either final or regular regular then the DFA can be reduced. The reduction is based on Hopcroft's Algorithm, as follows:
+
+1. Divide the states of the DFA into two groups: final and regular.
+2. While there are group changes:
+	* For each group change:
+		* If any two states of the group and a given input symbol, their transitions do not lead to the same group, these states must belong to different groups.
+
+NEED TO PRACTICE THIS.
 
 
 
