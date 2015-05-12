@@ -124,9 +124,18 @@ Deterministic finite automaton will describe a transition for every possible inp
 
 #### NFA to DFA, Two Key Functions:
 
- 1. Moves(STATE ID, INPUT), returns a list of the states possible to reach from the STATE ID, using the INPUT to traverse the automaton.
- 2. Epsilon_closeure(STATE ID), returns a list of the states possible to reach from the STATE ID only using empty transitions, essentially it's a recursive function.
+1. Moves(STATE ID, INPUT), returns a list of the states possible to reach from the STATE ID, using the INPUT to traverse the automaton.
 
+		Moves(STATE ID, INPUT):
+			List of reachable states = {}
+			For each transition from state STATE ID:
+				if transition == INPUT:
+					add transition.END STATE to reachable states
+
+			Return reachable states
+
+
+2. Epsilon_closeure(STATE ID), returns a list of the states possible to reach from the STATE ID only using empty transitions, essentially it's a recursive function.
 
 		Epsilon_closeure(STATE ID):
 			Collection of reachable states += Moves(STATE ID, EMPTY TRANSITION)
