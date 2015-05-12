@@ -179,16 +179,3 @@ The functions 'Move' and 'e-closure' are foundational to the subset construction
 		2. Apply the e-closure to this set of states, possibly resulting in a new set (This set of NFA states will be a single state in the DFA).
 3. Each time we generate a new DFA state, we must apply step 2 to it. The process is complete when applying step 2 does not yield any new states.
 4. The finish states of the DFA are those which contain any of the finish states of the NFA.
-
-
-
-
-
-	// initialise the algorithm, by defining the initial state of the NFA that we're converting to DFA.
-	Initial_NFA_State := state 0
-	Set_of_DFA_States := {}
-
-	// The first DFA state is always the result of the e-closure function on the first NFA state
-	Set_of_DFA_States.add( e-closure(Initial_NFA_state) ) 
-
-	// perform construction of the remaining states:
