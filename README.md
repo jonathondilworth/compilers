@@ -116,15 +116,15 @@ Regular expressions can be expressed as Transitions tables, which lead to determ
 * Every NFA can be converted into a DFA (Hopcroft's algorithm).
 * DFAs can automate the construction of lexical analysis.
 
-Non deterministic finite automaton (NFA) are possible if one or more transitions exist from one state to another state under the same transition criteria (match).
+Non deterministic finite automaton (NFA) are if one or more transitions exist from one state to another state under the same transition criteria (match). A regular expression is converted to an NFA using the rules described by Thompson's Construction.
 
-Deterministic finite automaton will describe a transition for every possible input, and will always terminate. Every NFA can be described using a DFA by isolating those states that creates the non deterministic property from the transitions table and constructing a deterministic variant.
+#### Key ideas for Thompson's Construction are outlined in an image in this Repo.
 
-#### Key ideas for Thompson's Algorithm are outlined in an image in this Repo.
+Deterministic finite automaton will describe a transition for every possible input, and will always terminate. Every NFA can be described using a DFA. This is done by isolating the states that create the non deterministic property from the transitions table and constructing a deterministic variant using the **subset construction algorithm**.
 
 #### NFA to DFA, Two Key Functions:
 
-1. Moves(STATE ID, INPUT), returns a list of the states possible to reach from the STATE ID, using the INPUT to traverse the automaton.
+1. Moves(STATE ID, INPUT), returns a list of the states possible to reach from the STATE ID, using the INPUT to traverse the automaton, but *DOES NOT INCLUDE THE STARTING STATE*.
 
 		Moves(STATE ID, INPUT):
 			List of reachable states = {}
@@ -134,7 +134,7 @@ Deterministic finite automaton will describe a transition for every possible inp
 
 			Return reachable states
 
-	This can also be modified to take a set of states as the input:
+	This can also be modified to take a set of states (collection ideally) as the input:
 
 		Moves_modifed({STATE IDS}, INPUT):
 			List of reachable states = {}
@@ -148,7 +148,7 @@ Deterministic finite automaton will describe a transition for every possible inp
 2. Epsilon_closeure(STATE ID), returns a list of the states possible to reach from the STATE ID only using empty transitions, essentially it's a recursive function.
 
 		Epsilon_closeure(STATE ID):
-			Collection of reachable states += Moves(STATE ID, EMPTY TRANSITION)
+			Collection of reachable states += Moves(STATE ID, EMPTY TRANSITION), this STATE ID
 			For each reachable state in reachable states:
 				Epsilon_closeure(reachable state)
 
@@ -157,7 +157,7 @@ Deterministic finite automaton will describe a transition for every possible inp
 	Again this could be modified to take a set as an argument:
 
 		Epsilon-closeure_modifed({STATE IDS}):
-			Collection of reachable states += {}
+			Collection of reachable states += {STATE IDS}
 			For each s in STATE IDS:
 				add Epsilon_closeure(s) to reachable states
 
@@ -168,5 +168,24 @@ As a side note that I thought was kind of interesting while coming up with this 
 
 *IDEA: Make an implementation in python that takes a regular expression from the user, constructs an NFA from this expression, converts this NFA into a DFA and then map this out using networkx and matplotlib python libraries - hopefully I'll have time to do this, because I think this could be pretty fucking cool! Why do I have to revise when I could be spending my time doing cool things? :( Wait a minute... wouldn't that actually be the implementation of a lexical analyser? Will come back to this point soon.. Would also like to point out that these can easily be modelled as directed graphs, states are nodes and transitions are directed edges between nodes which are weighted with value, this value COULD be numerical, since it is possible to map each symbol from the alphabet that makes up the vocabulary of the language to a value (maybe use a hashmap for this), or if netwokx allows, we could simply weight the edges of the directed graph with the symbols themselves...?*
 
+### The Subset Construction Algorithm
 
+The functions 'Move' and 'e-closure' are foundational to the subset construction algorithm, as described below:
 
+1. Create the start state of the DFA by taking the $\varepsilon$-closure of the start state of the NFA.
+2. Perform the following for the new DFA state: 
+	For each possible input symbol:
+		1. Apply 'Move' to the newly-created state and the input symbol; this will return a set of states.
+		2. Apply the $\varepsilon$-closure to this set of states, possibly resulting in a new set.
+		This set of NFA states will be a single state in the DFA.
+3. Each time we generate a new DFA state, we must apply step 2 to it. The process is complete when applying step 2 does not yield any new states.
+4. The finish states of the DFA are those which contain any of the finish states of the NFA.
+
+	// initialise the algorithm, by defining the initial state of the NFA that we're converting to DFA.
+	Initial_NFA_State := state 0
+	Set_of_DFA_States := {}
+
+	// The first DFA state is always the result of the e-closure function on the first NFA state
+	Set_of_DFA_States.add( e-closure(Initial_NFA_state) ) 
+
+	// perform construction of the remaining states:
