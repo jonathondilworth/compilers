@@ -195,7 +195,7 @@ If a DFA has the property where there exists two or more states whose transition
 
 NEED TO PRACTICE THIS.
 
-
+Once you have a transition table, you have a potential efficiency problem, because you have to linearly run through a table every time you want to check a symbol, or do you...? Make the transition table essentially a look-up table that reflects the code, this can be done automatically when generating the code.
 
 #References
 1. Rizos Sakellariou (2015), Compilers Lecture Slides, University of Manchester.
