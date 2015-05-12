@@ -9,17 +9,18 @@ Going to be making my notes in this markdown file, plus also maybe throwing some
 1. Introduction
 2. General Structure of a Compiler
 3. Introduction to Lexical Analysis
+4. Lecture Four: From REs to DFAs
 
 ## Lecture One: Introduction
 
 A compiler takes some source code, and produces an output in another language, while the meaning of the source.
 
-The compiler must:
+#### The compiler must:
  * Generate correct code.
  * Recognise errors.
  * Analyses and Synthesise.
 
-The properties of a good compiler:
+#### The properties of a good compiler:
  * Generates correct code.
  * Generates fast code (optimisations).
  * Conforms to specifications of input language (standardisations).
@@ -29,7 +30,7 @@ The properties of a good compiler:
  * Consistent optimisations => similar logic in all instances.
  * Works with debugger.
 
-Other issues:
+#### Other issues:
  * Speed (of compiled code).
  * Space (we don't want our executable to be larger than the input).
  * Feedback.
@@ -46,7 +47,7 @@ Source -> (analysis) -> Compiler -> (Synthesis) -> Target.
 
 The components of a compiler are outlined below:
 
-### Front End:
+#### Front End:
 
  1. Lexical Analysis (scanning): reads characters from source and produces a set of tokens.
  	a. Tokens come in the form: <token_class, attribute>.
@@ -62,7 +63,7 @@ The components of a compiler are outlined below:
  	c. Examples: Type Checking, Flow-of-Control Checking, Uniqueness (or reserved) Checking.
  4. Intermediate Code Generation: Translates language specific constructs into more general constructs.
 
-### Back End:
+#### Back End:
 
  5. IR Optimisation: Optimise the intermediate code.
  6. Code Generation: Map AST into a linear list of target machine instructions, in a symbolic form:
@@ -78,7 +79,7 @@ Natural languages have 'high degrees of freedom', as humans we're able to interp
 
 However, in a formalised language, such as a programming language, a 'high degree of freedom' isn't usually a good thing (although there is a trade off and you have some languages that are loosely typed, where as others are strongly typed - the degree of freedom which you design your language to have may affect the complexity of the implementation of the compiler / interpreter).
 
-### Formal Language Lingo:
+#### Formal Language Lingo:
 
  * Vocabulary: finite set of symbols.
  * String: finite sequence of symbols.
@@ -92,7 +93,7 @@ However, in a formalised language, such as a programming language, a 'high degre
 
 In order to construct a set of tokens during lexical analysis, we need to be able to recognise tokens (patterns) and we can identify an individual token using a CFG as above. Some tokens are easy to identify, e.g: white space (it can't really be much besides spaces and tabs, etc), but some tokens are going to be inherently more complex (e.g: floating point numbers?).
 
-### Regular Expressions
+#### Regular Expressions
 
 A regular expression is a way of expressing a regular language, it is a formula that describes a possibly infinite set of strings. Methods of performing lexical analysis using regular expressions:
  * Ad Hoc: break down the input into numerous smaller problems and process them separately.
