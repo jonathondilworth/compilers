@@ -197,6 +197,10 @@ NEED TO PRACTICE THIS.
 
 Once you have a transition table, you have a potential efficiency problem, because you have to linearly run through a table every time you want to check a symbol, or do you...? Make the transition table essentially a look-up table that reflects the code, this can be done automatically when generating the code.
 
+To-do:
+* Re-watch lecture five and make some more notes, do some more practice.
+* Practice exam questions associated with Lexical Analysis.
+
 #References
 1. Rizos Sakellariou (2015), Compilers Lecture Slides, University of Manchester.
 2. James Power (2002), Parsing Lecture Notes, National University of Ireland, Maynooth.
