@@ -122,4 +122,20 @@ Deterministic finite automaton will describe a transition for every possible inp
 
 #### Key ideas for Thompson's Algorithm are outlined in an image in this Repo.
 
+#### NFA to DFA, Two Key Functions:
+
+1. Moves(STATE ID, INPUT), returns a list of the states possible to reach from the STATE ID, using the INPUT to traverse the automaton.
+2. Epsilon_closeure(STATE ID), returns a list of the states possible to reach from the STATE ID only using empty transitions, essentially it's a recursive function:
+'''
+	Epsilon_closeure(STATE ID):
+		Collection of reachable states += Moves(STATE ID, EMPTY TRANSITION)
+		For each reachable state in reachable states:
+			Epsilon_closeure(reachable state)
+
+		Return reachable states
+'''
+
+As a side note that I thought was kind of interesting while coming up with this recursive algorithm, if we were to replace the collection of reachable states with a list, we could potentially end up with a infinite loop in our program (well actually, it would eventually terminate when we had a stack overflow, or ran out of memory or whatever, but you see what I', saying) theoretically it **could** never end since the NFA could be a cyclic graph, so we had better use a collection.
+
+*IDEA: Make an implementation in python that takes a regular expression from the user, constructs an NFA from this expression, converts this NFA into a DFA and then map this out using networkx and matplotlib python libraries - hopefully I'll have time to do this, because I think this could be pretty fucking cool! Why do I have to revise when I could be spending my time doing cool things? :(*
 
