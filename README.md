@@ -10,7 +10,8 @@ Going to be making my notes in this markdown file, plus also maybe throwing some
 2. General Structure of a Compiler
 3. Introduction to Lexical Analysis
 4. Lecture Four: From REs to DFAs
-5. 
+5. Lecture Five: DFA Minimisation
+6. Lecture Six: Exercise Lecture
 
 ##Lecture One: Introduction
 
