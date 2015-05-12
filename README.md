@@ -84,10 +84,10 @@ However, in a formalised language, such as a programming language, a 'high degre
  * Language: any set of strings over a fixed vocabulary.
  * Grammar: finite way of describing a language.
  * Context Free Grammar: G=(S,N,T,P):
-	*. S - Starting Symbol.
-	*. N - set of non-terminal symbols.
-	*. T - set of terminal symbols.
-	*. P - set of production rules.
+	* S - Starting Symbol.
+	* N - set of non-terminal symbols.
+	* T - set of terminal symbols.
+	* P - set of production rules.
 
 In order to construct a set of tokens during lexical analysis, we need to be able to recognise tokens (patterns) and we can identify an individual token using a CFG as above. Some tokens are easy to identify, e.g: white space (it can't really be much besides spaces and tabs, etc), but some tokens are going to be inherently more complex (e.g: floating point numbers?).
 
