@@ -119,6 +119,6 @@ Non deterministic finite automaton (NFA) are possible if one or more transitions
 
 Deterministic finite automaton will describe a transition for every possible input, and will always terminate. Every NFA can be described using a DFA by isolating those states that creates the non deterministic property from the transitions table and constructing a deterministic variant.
 
-### Key ideas for Thompson's Algorithm are outlined in an image in this Repo.
+#### Key ideas for Thompson's Algorithm are outlined in an image in this Repo.
 
 
