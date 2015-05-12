@@ -172,12 +172,11 @@ As a side note that I thought was kind of interesting while coming up with this 
 
 The functions 'Move' and 'e-closure' are foundational to the subset construction algorithm, as described below:
 
-1. Create the start state of the DFA by taking the $\varepsilon$-closure of the start state of the NFA.
+1. Create the start state of the DFA by taking the e-closure of the start state of the NFA.
 2. Perform the following for the new DFA state:
 	* For each possible input symbol:
 		1. Apply 'Move' to the newly-created state and the input symbol; this will return a set of states.
-		2. Apply the $\varepsilon$-closure to this set of states, possibly resulting in a new set.
-		* This set of NFA states will be a single state in the DFA.
+		2. Apply the e-closure to this set of states, possibly resulting in a new set (This set of NFA states will be a single state in the DFA).
 3. Each time we generate a new DFA state, we must apply step 2 to it. The process is complete when applying step 2 does not yield any new states.
 4. The finish states of the DFA are those which contain any of the finish states of the NFA.
 
