@@ -6,6 +6,7 @@ Going to be making my notes in this markdown file, plus also maybe throwing some
 
 1. Introduction
 2. General Structure of a Compiler
+3. Introduction to Lexical Analysis
 
 ## Lecture One: Introduction
 
@@ -45,18 +46,38 @@ The components of a compiler are outlined below:
 
 Front End:
 
- 1. Lexical Analysis (scanning): produces a set of tokens.
+ 1. Lexical Analysis (scanning): reads characters from source and produces a set of tokens.
+ 	a. Tokens come in the form: <token_class, attribute>.
+ 	b. For example: a=b+c becomes <id,a> <=,> <id,b> <+,> <id,c>.
+ 	c. More info: 'man flex'.
  2. Syntax Analysis (parsing): analyses the produced set of tokens and produces an **Abstract Syntax Tree (AST)**.
+ 	a. AST is a hierarchical structure, expressed using recursive rules.
+ 	b. Context free grammars formalise these rules.
+ 	c. AST is not a parse tree, parse tree contains lot's of unneeded information.
  3. Semantic Analysis: annotates the AST.
- 4. Intermediate Code Generation: 
+ 	a. Checks for semantic errors.
+ 	b. Annotates each node of the tree with results.
+ 	c. Examples: Type Checking, Flow-of-Control Checking, Uniqueness (or reserved) Checking.
+ 4. Intermediate Code Generation: Translates language specific constructs into more general constructs.
 
 Back End:
 
- 5. IR Optimisation: 
- 6. Code Generation: 
- 7. Target Code Optimisation: 
- 8. Target Code Generation:
+ 5. IR Optimisation: Optimise the intermediate code.
+ 6. Code Generation: Map AST into a linear list of target machine instructions, in a symbolic form:
+ 	a. Instruction Selection: Pattern Matching.
+ 	b. Register Allocation: NP-Complete Problem.
+ 	c. Instruction Scheduling: NP-Complete Problem.
+ 7. Target Code Optimisation: Machine code information required by the OS is generated.
+ 8. Target Code Generation: Machine code and associated information required by the Operating System are generated.
 
-## Lecture Three: Lexing
+## Lecture Three: Introduction to Lexical Analysis
 
-Lexing: reads characters and provides a sequence of tolkens.
+Natural languages have 'high degrees of freedom', as humans we're able to interpret words (symbols) in numerous ways, they're potentially ambiguous and based on their contextual confines (this is also arbitrary, because every person has their own internal dictionary and languages are not always set in stone, so to speak).
+
+However, in a formalised language, such as a programming language, a 'high degree of freedom' isn't usually a good thing (although there is a trade off and you have some languages that are loosely typed, where as others are strongly typed - the degree of freedom which you design your language to have may affect the complexity of the implementation of the compiler / interpreter).
+
+test below:
+
+$\frac{df}{dx} = \frac{1}{2} \left(\frac{ab \textrm{ sech}^2(b \sqrt{x})}{x} - \frac{a \tanh(b \sqrt{x})}{x^{3/2}} \right)$
+
+<script src="https://raw.githubusercontent.com/moski/gist-Blogger/master/public/gistLoader.js" type="text/javascript"></script>
