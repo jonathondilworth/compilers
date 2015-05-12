@@ -46,7 +46,7 @@ Source -> (analysis) -> Compiler -> (Synthesis) -> Target.
 
 The components of a compiler are outlined below:
 
-Front End:
+### Front End:
 
  1. Lexical Analysis (scanning): reads characters from source and produces a set of tokens.
  	a. Tokens come in the form: <token_class, attribute>.
@@ -62,7 +62,7 @@ Front End:
  	c. Examples: Type Checking, Flow-of-Control Checking, Uniqueness (or reserved) Checking.
  4. Intermediate Code Generation: Translates language specific constructs into more general constructs.
 
-Back End:
+### Back End:
 
  5. IR Optimisation: Optimise the intermediate code.
  6. Code Generation: Map AST into a linear list of target machine instructions, in a symbolic form:
@@ -78,6 +78,17 @@ Natural languages have 'high degrees of freedom', as humans we're able to interp
 
 However, in a formalised language, such as a programming language, a 'high degree of freedom' isn't usually a good thing (although there is a trade off and you have some languages that are loosely typed, where as others are strongly typed - the degree of freedom which you design your language to have may affect the complexity of the implementation of the compiler / interpreter).
 
-test below:
+### Formal Language Lingo:
+ * Vocabulary: finite set of symbols.
+ * String: finite sequence of symbols.
+ * Language: any set of strings over a fixed vocabulary.
+ * Grammar: finite way of describing a language.
+ * Context Free Grammar: G=(S,N,T,P):
+	a. S - Starting Symbol.
+	b. N - set of non-terminal symbols.
+	c. T - set of terminal symbols.
+	d. P - set of production rules.
 
-$\frac{df}{dx} = \frac{1}{2} \left(\frac{ab \textrm{ sech}^2(b \sqrt{x})}{x} - \frac{a \tanh(b \sqrt{x})}{x^{3/2}} \right)$
+In order to construct a set of tokens during lexical analysis, we need to be able to recognise tokens (patterns) and we can identify an individual token using a CFG as above. Some tokens are easy to identify, e.g: white space (it can't really be much besides spaces and tabs, etc), but some tokens are going to be inherently more complex (e.g: floating point numbers?).
+
+### Regular Expressions
