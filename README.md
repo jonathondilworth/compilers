@@ -1,3 +1,7 @@
+<script type="text/javascript"
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
 # Compilers : COMP36512
 
 Going to be making my notes in this markdown file, plus also maybe throwing some basic implementations written in python for lexing, parsing, etc (if I'm feeling adventurous).
@@ -79,5 +83,3 @@ However, in a formalised language, such as a programming language, a 'high degre
 test below:
 
 $\frac{df}{dx} = \frac{1}{2} \left(\frac{ab \textrm{ sech}^2(b \sqrt{x})}{x} - \frac{a \tanh(b \sqrt{x})}{x^{3/2}} \right)$
-
-<script src="https://raw.githubusercontent.com/moski/gist-Blogger/master/public/gistLoader.js" type="text/javascript"></script>
