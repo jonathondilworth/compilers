@@ -105,3 +105,20 @@ A regular expression is a way of expressing a regular language, it is a formula 
  			* current token := (regEx.id, = match length)
  			* current max match length := match length
  	* List of tokens.append(current token)
+
+Regular expressions can be expressed as Transitions tables, which lead to deterministic and non-deterministic Automatons.
+
+## Lecture Four: From REs to DFAs
+
+* REs can describe regular languages
+* Every RE can be converted into an NFA (Thompson's Construction).
+* Every NFA can be converted into a DFA (Hopcroft's algorithm).
+* DFAs can automate the construction of lexical analysis.
+
+Non deterministic finite automaton (NFA) are possible if one or more transitions exist from one state to another state under the same transition criteria (match).
+
+Deterministic finite automaton will describe a transition for every possible input, and will always terminate. Every NFA can be described using a DFA by isolating those states that creates the non deterministic property from the transitions table and constructing a deterministic variant.
+
+### Key ideas for Thompson's Algorithm are outlined in an image in this Repo.
+
+
