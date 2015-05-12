@@ -79,6 +79,7 @@ Natural languages have 'high degrees of freedom', as humans we're able to interp
 However, in a formalised language, such as a programming language, a 'high degree of freedom' isn't usually a good thing (although there is a trade off and you have some languages that are loosely typed, where as others are strongly typed - the degree of freedom which you design your language to have may affect the complexity of the implementation of the compiler / interpreter).
 
 ### Formal Language Lingo:
+
  * Vocabulary: finite set of symbols.
  * String: finite sequence of symbols.
  * Language: any set of strings over a fixed vocabulary.
@@ -92,3 +93,15 @@ However, in a formalised language, such as a programming language, a 'high degre
 In order to construct a set of tokens during lexical analysis, we need to be able to recognise tokens (patterns) and we can identify an individual token using a CFG as above. Some tokens are easy to identify, e.g: white space (it can't really be much besides spaces and tabs, etc), but some tokens are going to be inherently more complex (e.g: floating point numbers?).
 
 ### Regular Expressions
+
+A regular expression is a way of expressing a regular language, it is a formula that describes a possibly infinite set of strings. Methods of performing lexical analysis using regular expressions:
+ * Ad Hoc: break down the input into numerous smaller problems and process them separately.
+ 	* Advantage: can be efficient.
+ 	* Disadvantage: requires a lot of work! (and we don't like that, do we?) + difficult to modify.
+ * Automaton Analyser: Do it all automatically in the following manner.
+ 	* Data: List of tokens := {}, current token := (token.class, token.length) <- (null, 0), current regEx match length := 0
+ 	* for every regEx that belongs to the analysis of this language:
+ 		* if match length > current max match length:
+ 			* current token := (regEx.id, = match length)
+ 			* current max match length := match length
+ 	* List of tokens.append(current token)
