@@ -13,7 +13,7 @@ Going to be making my notes in this markdown file, plus also maybe throwing some
 
 ## Lecture One: Introduction
 
-A compiler takes some source code, and produces an output in another language, while the meaning of the source.
+A compiler takes some source code, and produces an output in another language, while the retaining meaning of the source.
 
 #### The compiler must:
  * Generate correct code.
@@ -134,6 +134,16 @@ Deterministic finite automaton will describe a transition for every possible inp
 
 			Return reachable states
 
+	This can also be modified to take a set of states as the input:
+
+		Moves_modifed({STATE IDS}, INPUT):
+			List of reachable states = {}
+			For each s in STATE IDS:
+				For each transition from state s:
+					if transition == INPUT:
+						add transition.END STATE to reachable states
+
+			Return reachable states
 
 2. Epsilon_closeure(STATE ID), returns a list of the states possible to reach from the STATE ID only using empty transitions, essentially it's a recursive function.
 
@@ -144,8 +154,19 @@ Deterministic finite automaton will describe a transition for every possible inp
 
 			Return reachable states
 
+	Again this could be modified to take a set as an argument:
+
+		Epsilon-closeure_modifed({STATE IDS}):
+			Collection of reachable states += {}
+			For each s in STATE IDS:
+				add Epsilon_closeure(s) to reachable states
+
+			return reachable states
+
 
 As a side note that I thought was kind of interesting while coming up with this recursive algorithm, if we were to replace the collection of reachable states with a list, we could potentially end up with a infinite loop in our program (well actually, it would eventually terminate when we had a stack overflow, or ran out of memory or whatever, but you see what I', saying) theoretically it **could** never end since the NFA could be a cyclic graph, so we had better use a collection.
 
-*IDEA: Make an implementation in python that takes a regular expression from the user, constructs an NFA from this expression, converts this NFA into a DFA and then map this out using networkx and matplotlib python libraries - hopefully I'll have time to do this, because I think this could be pretty fucking cool! Why do I have to revise when I could be spending my time doing cool things? :( Wait a minute... wouldn't that actually be the implementation of a lexical analyser? Will come back to this point soon..*
+*IDEA: Make an implementation in python that takes a regular expression from the user, constructs an NFA from this expression, converts this NFA into a DFA and then map this out using networkx and matplotlib python libraries - hopefully I'll have time to do this, because I think this could be pretty fucking cool! Why do I have to revise when I could be spending my time doing cool things? :( Wait a minute... wouldn't that actually be the implementation of a lexical analyser? Will come back to this point soon.. Would also like to point out that these can easily be modelled as directed graphs, states are nodes and transitions are directed edges between nodes which are weighted with value, this value **COULD** be numerical, since it is possible to map each symbol from the alphabet that makes up the vocabulary of the language to a value (maybe use a hashmap for this), or if netwokx allows, we could simply weight the edges of the directed graph with the symbols themselves...?*
+
+
 
