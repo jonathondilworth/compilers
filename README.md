@@ -201,6 +201,26 @@ To-do:
 * Re-watch lecture five and make some more notes, do some more practice.
 * Practice exam questions associated with Lexical Analysis.
 
+##Lecture Six: Examples Lecture
+
+##Lecture Seven: Introduction to Parsing (Syntax Analysis)
+
+Okay, so we've taken some input-stream and have generated a set of tokens based on that input, now we need to check that these tokens are syntactically correct; that is, that they are in the correct order, so to speak.
+
+Regular Expressions have limits, for example:
+* We can't use REs to check matching brackets.
+* Or the set of zeros followed by an equal number of ones.
+
+In regular expressions, a non-terminal symbol cannot be used before it has been fully defined.
+
+All we're doing with LEXICAL ANALYSIS is detecting patterns one after another, there is no way of specifying rules such as, "if there is an opening bracket here, we need to make sure there is a closing bracket there..".
+
+*Regular Languages* are a subset of *Context-Free Languages*, which are a subset of *Context Sensitive Languages*, which are a subset of *Phrase Structured Languages*.
+
+In a context free grammar, the only additional rule to regular languages (REs) is that **every LHS symbol should be a non-terminal symbol**.
+
+
+
 #References
 1. Rizos Sakellariou (2015), Compilers Lecture Slides, University of Manchester.
 2. James Power (2002), Parsing Lecture Notes, National University of Ireland, Maynooth.
