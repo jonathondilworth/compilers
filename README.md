@@ -614,7 +614,86 @@ We can use either:
 
 ##Lecture Fifteen: Code Generation - Instruction Selection
 
-<UPDATE THIS>
+Now, we're moving to the back end!
+
+Instruction Selection.
+* How do we convert intermediate representation into the target programme?
+* How does the compiler decide what will be stored in registers and what should be placed in main memory, how do we optimise what stays where??
+* Given we have some instructions, what is the right order for these instructions to execute?
+
+If two instructions do not depend on each other, then they can be executed in any order. Modern processors have the ability to execute things in parallel.
+
+What should be executed first? We need to optimise.. Ideally we would like the address all of the above problems as an optimisation problem. People tend to break down these problems.
+
+We're going to look at:
+* Instruction Selection.
+* Register Allocation.
+* Instruction Scheduling.
+
+####Instruction Selection as a Problem:
+
+The approach of mapping an Intermediate Representation onto low level instructions, we're talking about a pattern matching problem, consider an Add instruction at the intermediate level and we're mapping to a low level function, we're going to be implementing it as an ADD instruction, simple: Add -> Add. We can detect things like loops in the AST, in the same way we would recognise an ADD, we can recognise a loop and convert it to it's machine code equivalent.
+
+So, we can issue multiple cycles at a time. An Add would be a single cycle, but a loop will be a multi-cycled set of instructions. So in Instruction Scheduling, there is an instruction latency, this is the time the instructions was issued until the time of the results of this instruction are available.
+
+####Code Generation for Arithmetic Expressions
+
+Example: X + Y
+
+	LOAD r1, X
+	LOAD r2, Y
+	ADD	 R1, R1, R2
+	STR  R1
+
+The load is usually done using a base register and an offset:
+
+	LOAD r1, [base, offset]
+
+####Issues with Arithmetic Expressions
+
+If the value of x is already in the memory somewhere, there's no point loading it in again. So how do we determine if it's already in the memory? Can potentially do a number of passes to work it out.
+
+Which subtree do you evaluate first in a complex expression? Evaluate the most complex sub tree first.
+
+If there are free registers available, should we use them? If all our registers are used, how do we determine which register do we select to switch out? (LRU?)
+
+Multiplications and Divisions: The cost of multiplication should be several cycles, shift operations take just one cycle, can potentially optimise.
+
+####Trading Register Usage with Performance
+
+Two possible approaches of: W = W * 2 * x * y * z
+
+	LOAD r1, @w 		
+	MOV  r2, 2 			
+	MULT r1, r1, r2 	
+	LOAD r2, @x
+	MULT r1, r1, r2
+	LOAD r1, @y
+	MULT r2, r1, r2
+	LOAD r1, @z
+	MULT r2, r1, r2
+	STR  r1 			
+
+The problem with this is that the programme is going to halt and wait for the values to be loaded into the registers (it's going to halt) until the values are available (due to the latency).
+
+Approach 2:
+
+	LOAD r1, @w
+	LOAD r2, @x
+	LOAD r3, @y
+	LOAD r4, @z
+	MOV  r5, 2
+	MULT r1, r1, r5
+	MULT r1, r1, r2
+	MULT r1, r1, r3
+	MULT r1, r1, r4
+	STR  r1
+
+Here, the LOAD instructions can be overlapped (remember the pipeline for OS year two), so we can save on instructions.
+
+**Principal, do the things which have a higher latency as early as possible.**
+
+&& and || operators, compilers will only evaluate one part (X) of the code and if it's false for an if(X && Y), because it's just wasted cycles.
 
 #References
 1. Rizos Sakellariou (2015), Compilers Lecture Slides, University of Manchester.
