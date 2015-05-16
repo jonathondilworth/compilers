@@ -15,6 +15,7 @@ Going to be making my notes in this markdown file, plus also maybe throwing some
 9. Lecture Nine: Bottom Up Syntax Analysis (needs updating)
 10. Lecture Ten: Exercise Lecture
 11. Lecture Eleven: Context Sensitive Analysis
+12. Lecture Twelve: Intermediate Representations & Symbols Tables
 
 ##Lecture One: Introduction
 
@@ -333,6 +334,136 @@ Complex dependencies?
 These dependency graphs produce a topological order based on the dependencies.
 
 **This area of research isn't very successful for compilers in general because of the complexity involved in the graphs, etc**
+
+## Lecture Twelve: Intermediate Representations & Symbols Tables
+
+Now the compiler has established that the input is correct, can represent it in a form that is convenient (AST) and then perform optimisations on this input.
+
+AST allows us to represent what we already know and in a hierarchical form and it contains all the information we need.
+
+AST is the form of representation that is as close as possible to what we've already seen, and it's easy to manipulate. It's close to the high level implementation.
+
+Why do we need this?
+
+The IR is suppose to be convenient for the compiler.
+
+####Design Issues
+
+* We need something lightweight.
+* We need something that is easy to manipulate.
+* The decisions we make here in terms of the implementation of the IR directly influences the performance of the back-end, so it's important.
+* ease of generation.
+* ease of manipulation.
+* cost of manipulation.
+
+Control flow graph?
+
+####Abstract Syntax Tree
+
+Can be directly derived from the parse tree, all we have to do is eliminate all the symbols introduced in syntax analysis.
+
+Capturing the hierarchy of the 
+
+####Directed Acylic Graphs
+
+Graphs that do not have cylces, every edge points from one node to another.
+
+Advantages:
+* if we use one of these, we can save space, because we can put a cycle where we have a repeated statement.
+
+However, search (traversing the tree) can be problematic (slower) because we have to go in cycles sometimes.
+
+####Control Flow Graph
+
+Models the way that the code transfers control between blocks in the procedure.
+
+* Node: a single basic block (a maximal straight line of code)
+* Edge: transfer of control between basic blocks.
+* (Captures loops, if statements, case, goto).
+
+####Data Dependence Graph
+
+Encodes the flow of data.
+
+* Node: program statement
+* Edge: connects two nodes if one uses the result of the other
+* Useful in examining the legality of program transformations
+
+####Call Graph
+
+Show dependencies between procedures. Useful for inter-procedural analysis.
+
+####Three-Address Code
+
+	if (x > y) then z = x - 2 * y
+
+becomes
+
+	t1 = load x
+	t2 = load y
+	t3 = t1 > t2
+	if not(t3) goto L
+	t4 = 2 * t2
+	t5 = t1 - t4
+	z = store t5
+	
+	L
+
+####Two Address Code
+
+	LOAD	r1, x
+	LOAD	r2, y
+
+	CMP		r1, r2
+	BLEQ	skip
+
+	LOADI	r3, #2 			// load literal
+	MULT	r2, r3, r2
+	SUB		r1, r1, r2
+	STR		z, r1			// assuming z is a memory address
+
+	skip
+
+####One address code
+
+Basically similar to the above, but we just use the stack to push and pop variables..
+
+####Symbol Table
+
+Defines how types interact?? Captures information about all the useful symbol in the programme:
+* variables.
+* program names.
+* labels.
+* function names / subroutine names.
+* everything that requires some memory space, or it effects control.
+* once a compiler finds that there is a certain variable, contain all information associated with this variable in a centrally generated table (same block of memory? i.e: objects in Java stored in same memory block - makes garbage collection and referencing easier, perhaps..)
+
+####Information compiler needs to know about each item:
+* name.
+* data type.
+* declaring procedure (constructors?)
+* storage information (where this is being held in memory? in Java this might be reference - hashed memory location, in C it might be an actual memory location).
+* depending on what it is: perhaps the parameters if it's a function, etc.
+
+####How can we organise a symbol table??
+
+This determines the efficiency of compilation. It would be nice to have some kind of look-up table??
+
+As a linear list - > BAD. It's going to be too big to linearly run through the list every time we want to check a symbol, your compilation time is going to be insane.
+
+Binary Tree - > better? Good for searching, but not so great for re-structuring, we don't know how people are going to declare their variables, or structure their program. It's going to have to be rebalanced ALOT, and rebalancing is going to be computationally expensive.
+
+Hash Table - > If we have a hash function, then we can map every name (id) to a different element of a the table. Which would be pretty good, right? Make a hash function which provides a unique hash for every different name and just not allow the reuse of the same name or reserved words. E.g: take the ASCII of each letter and perform some kind of unique hash function, which would be... I can't think of one / remember one off the top of my head; google search...
+
+What if we don't have a unique hashing function..? If we get a collision, we can could create a linear list associated with that particular position. But the hash function has to be good and the table has to be quite a large container.
+
+Alternative: Re-hashing, every time there is a collision, you can just rehash, this is equivalent to choosing a unique hash function, I believe...? Can you get unique hash functions..? Pretty sure it's accomplished through re-hashing anyway.
+
+####Conclusion
+
+Symbol table is an important data structure, and hash table is the best way of doing this. But we need a good hash function and we need to be able to resolve collisions.
+
+
 
 
 #References
