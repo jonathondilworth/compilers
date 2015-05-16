@@ -280,8 +280,59 @@ Top down parsing is good if we have a really simple grammar (as long as the gram
 
 ##Lecture Eleven: Context Sensitive Analysis
 
+In terms of syntax analysis, we can have code that is syntactically correct but in terms of context, it may be incorrect. For example, you could have a function with five arguments, but you could have a call to this function with six arguments. This is syntactically correct, but contextually incorrect.
 
+* Property: Something is an error because of something defined somewhere else in the code.
 
+####Type Checking
+
+Programming languages that have a declare before use policy have a table which can be checked to see how two different types may interact under different operations. Components of a type system:
+* Base or Built In types (integers, boolean, characters, etc).
+* Rules to:
+	* construct new types. 
+	* determine if two types are equivalent (table).
+	* infer the type of source language expressions.
+
+This is not difficult for a language with a declare before use policy, but if the language does not have a declare before use policy, then it becomes more challenging.
+
+####Attribute Grammar
+
+For every symbol in the language, have an associated value that has some kind of semantic meaning, such that we are in some kind of situation to answer some semantic questions. Essentially labels.
+
+Two types of attributes:
+1. Synthesised Attributes: derive their value from constants and children (evaluated bottom up).
+2. Inherited Attributes: derive their value from parent, constants and siblings.
+
+Example: you could have a attribute called type, which holds a value which indicates the type of the token.
+
+Example: reading a binary number (-101):
+
+Sign-> +
+    |  -
+List->List1, Bit
+    | Bit
+Bit->  0
+    |  1
+
+Sign has an attribute neg or pos, bit has two attributes, pos and val. Val is dependant on position.
+
+####Dependancy Graph
+
+If one node depends on another, then the former will have to be evaluated before the latter.
+
+* Nodes represents attributes; edges represent the flow of values.
+* Graph is specific to the parse tree.
+* Evaluation order:
+  * Parse tree methods: cyclic graphs fail.
+  * Rule based methods: the order is statically predetermined.
+  * Oblivious methods: convenient approach independent of semantic rules.
+
+How do we deal with cycles?
+Complex dependencies?
+
+These dependency graphs produce a topological order based on the dependencies.
+
+**This area of research isn't very successful for compilers in general because of the complexity involved in the graphs, etc**
 
 
 #References
