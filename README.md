@@ -1,5 +1,3 @@
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
 #Compilers : COMP36512
 
 Going to be making my notes in this markdown file, plus also maybe throwing some basic implementations written in python for lexing, parsing, etc (if I'm feeling adventurous).
@@ -12,6 +10,8 @@ Going to be making my notes in this markdown file, plus also maybe throwing some
 4. Lecture Four: From REs to DFAs
 5. Lecture Five: DFA Minimisation
 6. Lecture Six: Exercise Lecture
+7. Lecture Seven: Introduction to Parsing
+8. Lecture Eight: Top Down Syntax Analysis
 
 ##Lecture One: Introduction
 
@@ -218,6 +218,35 @@ All we're doing with LEXICAL ANALYSIS is detecting patterns one after another, t
 *Regular Languages* are a subset of *Context-Free Languages*, which are a subset of *Context Sensitive Languages*, which are a subset of *Phrase Structured Languages*.
 
 In a context free grammar, the only additional rule to regular languages (REs) is that **every LHS symbol should be a non-terminal symbol**.
+
+Replacing symbols in a set of tokens using a context free grammar, in order to ensure it is syntactically correct is accomplished through the execution of **derivations**. We can derive a set of symbols in two such ways:
+ 1. Left most derivation: at each iteration, replace the left most non-terminal symbol.
+ 2. Right most derivation: the same, but replace the right most non-terminal.
+
+A parse tree can be constructed to graphically represent these processes (derivations):
+
+	Start with the starting symbol (root of the tree).
+	For each sentential form:
+		add child nodes to the node corresponding to the LHS symbol.
+
+	The leaves of the tree constitute a sentential form.
+
+####Ambiguity
+
+Any grammar that has more than one left-most or right-most derivation for the same output is ambiguous, and if it is ambiguous a grammar is not good for a compiler, because it will construct two different parse trees and so the language will have no notion of precedence.
+
+If a programming language is defined such that it may accept ambiguous terms (loosely typed), the analysis of these parts must be postponed until later in the compilation process (FORTRAN, python? ruby?).
+
+####Parsing Techniques
+
+Once we've got a grammar that is not ambiguous, there are two different ways to do syntax analysis:
+ 1. Top down: Useful if we have simple grammars and simple strings.
+ 2. Bottom up: Most compilers use bottom up because this type of parsing can be automated. From a compilers point of view, it needs to have some deterministic way of finding out what the next substitution should be, at every token.
+
+
+## Lecture Eight: Top Down Syntax Analysis
+
+
 
 
 
