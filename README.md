@@ -11,7 +11,10 @@ Going to be making my notes in this markdown file, plus also maybe throwing some
 5. Lecture Five: DFA Minimisation
 6. Lecture Six: Exercise Lecture
 7. Lecture Seven: Introduction to Parsing
-8. Lecture Eight: Top Down Syntax Analysis
+8. Lecture Eight: Top Down Syntax Analysis (needs updating)
+9. Lecture Nine: Bottom Up Syntax Analysis (needs updating)
+10. Lecture Ten: Exercise Lecture
+11. Lecture Eleven: Context Sensitive Analysis
 
 ##Lecture One: Introduction
 
@@ -244,7 +247,38 @@ Once we've got a grammar that is not ambiguous, there are two different ways to 
  2. Bottom up: Most compilers use bottom up because this type of parsing can be automated. From a compilers point of view, it needs to have some deterministic way of finding out what the next substitution should be, at every token.
 
 
-## Lecture Eight: Top Down Syntax Analysis
+##Lecture Eight: Top Down Syntax Analysis
+*(This lecture needs updating..)*
+
+* Construct the top node of the tree & rest with pre-order (depth-first).
+* Pick a production rule and try and match the input, if you fail, backtrack.
+* Essentially: try and find a left most derivative for the input string.
+* Some grammars are back-track free (predictive parsing)
+
+####Problems
+
+* Not necessarily very efficient, due to possible failures.
+* There is potential to enter into a infinite loop (remember compilers are machines and are algorithmic, trying to tell whether a program is infinite or not is an NP complete problem, I think?).
+
+####Left Recursive Grammars
+
+Grammar is left recursive if it has a non-terminal A, such that A->Aa, for some string a.
+
+####LL1 Property
+
+<UPDATE THIS BIT>
+
+#####Conclusion
+
+Top down parsing is good if we have a really simple grammar (as long as the grammar has simple properties: LL1, use top down parsing because it can be done without backtracking). However in the general case, real compilers use bottom up syntax analysis because not all grammars have the LL1 property.
+
+##Lecture Nine: Bottom Up Syntax Analysis
+
+<UPDATE THIS>
+
+####Lecture Ten: Examples Exercise
+
+##Lecture Eleven: Context Sensitive Analysis
 
 
 
