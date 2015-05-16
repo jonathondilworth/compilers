@@ -16,6 +16,10 @@ Going to be making my notes in this markdown file, plus also maybe throwing some
 10. Lecture Ten: Exercise Lecture
 11. Lecture Eleven: Context Sensitive Analysis
 12. Lecture Twelve: Intermediate Representations & Symbols Tables
+13. Lecture Thirteen: Procedure Abstraction, Run-Time Storage Organisation
+14. Lecture Fourteen: Exercise Examples
+15. Lecture Fifteen: Code Generation - Instruction Selection
+
 
 ##Lecture One: Introduction
 
@@ -463,8 +467,154 @@ Alternative: Re-hashing, every time there is a collision, you can just rehash, t
 
 Symbol table is an important data structure, and hash table is the best way of doing this. But we need a good hash function and we need to be able to resolve collisions.
 
+##Lecture Thirteen: Procedure Abstraction, Run-Time Storage Organisation
 
+Source Code -> FRONT END -> IR -> MIDDLE END -> IR -> BACK-END -> OBJECT CODE
 
+We're talking about all kinds of stuff today (not really about compilers only):
+* Interface of compilers
+* OS
+* Linkers
+* Libraries
+* Hardware
+
+How is the compiler going to interact with the OS, in order to produce code that is going to respect what the OS is doing??
+
+####The Procedure
+
+Notions:
+* functions / procedure / subroutine, etc..
+
+What is a procedure (or function, method, etc..):
+
+We need some kind of functions / methods to be able to write code.. From a procedure, we get a well defined entry and exit. At the entry point we can pass some parameters or arguments. The clear exit point returns either a value or just returns without a value. It's all well defined.
+
+A procedure generally has it's own name space, so we can declare variables that are only live within that procedure.
+
+The implications of translating procedures:
+* We need to have some kind of agreement between the compiler, architecture and OS, since:
+ * There needs to be a way of deciding where the memory will be allocated, etc..
+ * How these procedures are going to be called, etc..
+
+The compiler can compile procedures separately, however the code that the compiler generates should be in a position to be called by other programs.
+
+From the HARDWARES point of view, the procedure is just an artificial creation, the hardware doesn't support anything that would make procedures possible. All the hardware knows is how to execute sequences of instructions. We have to think about what characterises a procedure.. 
+
+Think about well defined ENTRY and EXIT, this implies the compiler will have to jump from one part of the program to somewhere else. This is fine, because all that will happen at run-time is that control will be transferred from one programme to another, so to speak..
+
+We need to ensure that all of these qualities are implemented in the compiler. The abstraction that is supported by the high level languages needs to be translated to the hardware level, otherwise it's a wasted effort. How do we ensure this very nice abstraction is going to be translated in a way that really makes sense?
+
+For example: we want to have name-spaces where variables defined within a certain scope are only available in that scope. This is easy to understand at a high level, but when we're actually translated this to the hardware level, how do we do it...? We're going to need to do a lot of book-keeping..
+
+What we would like to do is to get the compiler to provide space at run-time for the variables that only going to be needed within a specified scope. Then when we enter into a new procedure, etc - we want to allocate some more space, then free it up again when we exit that procedure.
+
+We use a convention to do this... The **Linkage Convention**.
+
+####The Linkage Convention
+
+At the beginning and at the end of a procedure some book-keeping is done. Space can be dynamically allocated at run-time, this space can then be removed once the procedure is exited (garbage collection in Java or free() in C, etc).
+
+If at run-time we are in a position to allocate space only as it is needed, in modern systems, this is happening through activation records (stack frame, or a frame - some space in memory that will be reserved only at a call to a procedure); then it will be removed.
+
+This stack frame includes:
+* Parameters ()
+* Save Area (we're going to need to save everything - values of registers - push everything onto another stack)
+* space for return value
+* address for resume (Link Register)
+* access link - for non-local access to variable declarations (link to parent, or callee?)
+* pointer to activation record of the caller
+* space for local variables, temporaries, anything defined within this procedure.
+
+What we really want is a compiler that will allocate space when a call to a function happens, then when it exits, it has to free up the memory.
+
+**Calling a procedure has an overhead.**
+
+####Procedure Linkages:
+
+Caller (pre-call):
+* Allocate Activation Record
+* Evaluate Storage for Parameters
+* Store Return Address
+* Store self AR pointer
+* store AR pointer to child
+* jump to the child
+
+callee (prologue):
+* save current value of registers.
+* extend AR for local data.
+* get static data area base address.
+* initialise those variables.
+* fall through code.
+
+callee (epiloge):
+* Store return value
+* restore registers and state
+* deallocate what was extended here for local data
+* restore the parents activation pointer.
+* jump to the return address. 
+
+Caller (post-return):
+* copy return values
+* deallocate the activation record for callee
+* restore parameters
+
+Pretty straight forward... Done a lot of this when writing assembly language..
+
+*although.. what the fuck are activation records???*
+
+Activation records: stack frames are otherwise known as activation records.. apparently.. (wikipedia)
+
+####Placing Run-Time Data Structures:
+
+Code | Static & Global | Heap ->> | <<- Stack
+
+Most things to do with activation records are stored, usually, in the stack. Heap and stack grow towards each other. From a compilers point of view, the space for everything can be predicted and mapped accordingly to somewhere specific.
+
+####Activation Record Details
+
+How does the compiler find the variables?
+* They are offsets from the AR base pointer.
+* Everything is calculated as an offset from the AR base pointer.
+
+Where do activation records live?
+* If it makes no calls, then AR can be allocated statically.
+* Place in heap if we need access to these ARs / AR attributes after EXIT, I.E global variables?
+* Otherwise, whack it in the stack (implication: life-time of AR matches life-time of the invocation).
+
+If AR makes no calls to any other procedures, then only one is active at a time. But what if a call makes a call to another procedure..? 
+
+Efficiency wise: Static, Stack, Heap.
+
+(Most efficient -> Least Efficient)
+
+####Run-Time Storage Organisation
+
+We can use either:
+* Access links, which, if I understand correctly, basically every time you make a call to a function, from within a function, it throws everything on to the heap for storage, or allocates more memory on the stack??? Basically keeps stacking up, so there is a fair amount of overhead.
+* Alternatively, use global display, that calculates an offset from the base AR, but also keep an array somewhere in memory that holds pointers to ARPs for each level. So basically, you're going to allocate memory in multiple locations for multiple AR, but keep the base pointer for each AR in an array, and just move through this array as you enter into new and exit from procedures..? I think..
+
+**not too sure if I'm correct with the access links, I'll check with others when I go in on Monday to try and solidify my understanding of this**
+
+####Other storage issues
+
+* 32 bit, or 64 bit? Why does this matter -> because of the offset, right? Are we using a 4 bit offset, are we using a x bit offset? Essentially, what is the word boundary? Everything is arbitrary.
+* Cache Performance: if two variables are in near proximity in the code, then it is convenient to store them in near proximity in the cache. Complex stuff.
+* Conventional Wisdom: tight on registers: use access links, lot's of registers: use global display.
+* memory to memory VS register to register.
+* managing the heap: first-fit allocation with several pools for common sizes (usually powers of 2 up to page size). 
+* object-orientated languages have complex name spaces.
+
+####Conclusion / Finally...
+
+* The compiler needs to emit code for each call to a procedure to take into account (at run-time) procedure linkage.
+* The compiler needs to emit code to provide (at run-time) addressability for variables of other procedures.
+* Inlining: the compiler can avoid some of the problems related to procedures by substituting a procedure call with the actual code for the procedure. There are advantages from doing this, but it may not be always possible (can you see why?) and there are disadvantages too.
+
+####Lecture Fourteen: Examples Exercise
+
+##Lecture Fifteen: Code Generation - Instruction Selection
+
+<UPDATE THIS>
 
 #References
 1. Rizos Sakellariou (2015), Compilers Lecture Slides, University of Manchester.
