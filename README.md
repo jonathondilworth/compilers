@@ -739,7 +739,7 @@ if we have 10 values, and only 5 registers on the processor (number of values to
 
 Problem: what if the most commonly used values are only just used in the first half of the basic block, or they are just used in the second half of the basic block? It's not very efficient. Or perhaps, they are only just more commonly used than the other values.
 
-#####Another Naive Approach
+#####Bottom Up Allocation
 
 Load the most commonly used value into a register and use the remaining registers as needed. We have a pool of registers, and in this pool of registers, we strictly go with the live ranges.
 
