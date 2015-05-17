@@ -964,14 +964,102 @@ Optimisation can be based on multiple different things:
 
 ##Lecture Nineteen: Code Optimisation
 
-<INSERT NOTES HERE> - LAST LECTURE! ALMOST THERE...!!
+* Goal: improve program performance within some constraints (small sized code, power consumption, etc). <- HOW DO WE DEFINE OUR OBJECTIVE FUNCTION!? Usually via efficiency.
+* Issues:
+	* Legality: must preserve the meaning of the program.
+		* Externally observable meaning may be sufficient/may need flexibility.
+	* Benefit: must improve performance on average or common cases.
+		* Predicting program performance is often non-trivial.
+	* Compile-time cost justified: list of possible optimisations is huge.
+		* Inter-procedural optimisations (O4).
+
+If you test GCC by enabling optimisations, then the compilation time is going to be longer, moderately sized programme, not small but not huge.
+
+####Optimising Transformations
+
+How do the compilers apply the optimisations? They have different transformations and they apply these in some kind of a sequence: T1->T2->T3->...->T_N.
+
+Transformations may improve program at:
+ * Source Level
+ * IR
+ * Target Code
+
+Some typical transformations:
+ * Discover and propagate some constant value.
+ * Remove unreachable / redundant computations.
+ * Encode a computation in some particular efficient form.
+
+For example, we might implement a multiplication as a number of additions and shifts. But this is machine-specific, because 32 bit, 64 bit, etc.
+
+####Classification
+
+* By Scope:
+	* Local: within a single basic block.
+	* Peep-hole: on a window of instructions (usually local).
+	* Loop-Level: on one or more loops or loop nests.
+	* Global: for an entire procedure.
+	* Inter-procedural: across multiple procedures or whole program.
+* By machine information used:
+	* Machine-independent versus machine-dependent.
+* By effect on program structure:
+	* Algebraic transformations (e.g., x + 0, x * 1, 3 * z * 4, ...)
+	* Reordering transformations (change the order of 2 computations)
+		* Loop transformations: loop-level reordering transformations.
+
+On average 90% of program execution is spent inside loops.
+
+####Optimisation Transformations:
+
+* Common subexpression elimination: searches for instances of identical expressions (i.e., they all evaluate to the same value), and analyses whether it is worthwhile replacing them with a single variable holding the computed value.
+* Copy propagation: from a programmers point of view, it might be a good idea to implement two different variables for two separate purposes, that contain the same value, because it is sensical for maintenance. From a compilers point of view, there is no point, its a waste, because variables take registers, take space in memory, etc. We can not both using both variables, we just use one and propagate it as far as it is un-changed in the programme.
+* Constant propagation: *Don't really get this.. constants should never change anyway?*
+* Constant folding: compiler can compute literals such as 5*3+8-12/2 at compilation time, rather than run-time.
+* Dead-code elimination: code that is redundant or is never going to be executed:
+
+	if(3>7)
+	{
+		// Execute this
+	}
+
+The above is NEVER going to be executed, so we just remove it.
+
+* Reduction in strength: Changing multiplication from a standard multiplication to additions and shifts to save on cycles.
+
+Sometimes we need one transformation for the compiler to realise that another transformation is possible. For example, applying constant folding in order to apply constant propagation, in order to realise that dead-code can be removed:
+
+T1->T2->T3
+
+####Loop Transformations
+
+* Loop-invariant code-motion:
+	* Detect statements inside a loop whose operands are constant or have all their definitions outside the loop - move out of the loop.
+* Loop interchange:
+	* Interchange the order of two loops in a loop nest (needs to check legality): useful to achieve unit stride access.
+* Strip mining:
+	* May improve cache usage when combined with loop interchange.
+
+
+####Loop Unrolling
+
+Loops are interesting high level structures, but if we think about the low level implementation, they create problems, because a simple:
+
+	for(int i = 0; i < 5; i ++)
+	{
+		// EXECUTE CODE
+	}
+
+We're doing so much for just one line of code. Declaring a variable, making a comparison, branching, incrementing, etc.
+
+But we could just create the same loop body 5 times in a row and would be more optimal. Large Basic Blocks.
+
+Compiler point of view, interesting transformations, has benefits. Increases the size of the code, but if the size of the code can be increase to gain a benefit in terms of run-time execution, then this is beneficial.
 
 ##Twenty: Additional Notes for Exam
 
 Questions I'm likely to answer:
-1. DFA / NFA Question
-2. Question on live ranges and graph colouring
-3. Humm.......... Not sure!
+ 1. DFA / NFA Question.
+ 2. Question on live ranges and graph colouring.
+ 3. Humm .......... Not sure!
 
 **Need to go over these particular topics in detail!**
 
@@ -979,3 +1067,4 @@ Questions I'm likely to answer:
 1. Rizos Sakellariou (2015), Compilers Lecture Slides, University of Manchester.
 2. James Power (2002), Parsing Lecture Notes, National University of Ireland, Maynooth.
 3. Wikipedia (2015), Instruction Scheduling, http://en.wikipedia.org/wiki/Instruction_scheduling
+4. Wikipedia (2015), Common subexpression elimination, http://en.wikipedia.org/wiki/Common_subexpression_elimination
