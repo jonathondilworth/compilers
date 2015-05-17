@@ -22,7 +22,7 @@ Going to be making my notes in this markdown file, plus also maybe throwing some
 16. Lecture Sixteen: Register Allocation
 17. Lecture Seventeen: Register Allocation via Graph Colouring
 18. Lecture Eighteen: Instruction Scheduling
-19. 
+19. Lecture Nineteen: Code Optimisation
 20. Additional Notes for Exam
 
 ##Lecture One: Introduction
