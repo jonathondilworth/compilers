@@ -20,7 +20,10 @@ Going to be making my notes in this markdown file, plus also maybe throwing some
 14. Lecture Fourteen: Exercise Examples
 15. Lecture Fifteen: Code Generation - Instruction Selection
 16. Lecture Sixteen: Register Allocation
-
+17. Lecture Seventeen: Register Allocation via Graph Colouring
+18. Lecture Eighteen: Instruction Scheduling
+19. 
+20. Additional Notes for Exam
 
 ##Lecture One: Introduction
 
@@ -751,7 +754,228 @@ Instruction 7: A live range terminates, return this register to the pool..
 
 If at some point the pool is empty, then try to store to the main memory, the register that is going to be used the furtherest in the future, because we don't need this register for quite a while.
 
+##Lecture 17: Register Allocation via Graph Colouring
+
+####Recap on last lecture
+
+We have code that needs to allocate 30 values, we have 10 registers. What we are going to do, is we are going to maintain a pool of registers and then we are going to get one only when it is necessarily. It is only necessarily when we are going to assign a value.
+
+At the point where we don't need the register any more (it's live range ends), the is returned to the pool. If at some point the pool has no more registers to offer, we look for the value that is not used until the longest time in the future, we push the value from this register into main memory, which we can restore again when we need it.
+
+^^ Bottom Up Allocation: many people have argued that this algorithm gives good results.
+
+There is another idea... Which is often used in practice, is because it allows us to formulate the problem of register allocation, using a well studied and well understood graph theory problem and then we can try and solve the graph theory problem and use a solution based on this...
+
+####Register Allocation via Graph Colouring
+
+How many colours do we need in order to colour this graph, in such a way that two neighbouring nodes do not share the same colour?
+
+* The colouring of a graph is an assignment of colours to nodes, such that nodes connected by an edge have different colours.
+* A graph is k-colour-able if it has a colouring with k-colours.
+
+In our problem, the colours co-respond to registers. K = number of physical registers.
+
+Principal: We have to take our live ranges that overlap cannot share the same register, and therefore they should be represented using a connection.
+
+The interference Graph is derived from these live ranges, each register whose live rage overlaps with another register, then it should be represented as a node with an edge connected between them.
+
+**REMEMBER: If we make the assumption that when one live range ends and another begins, we minus one from the live range and this principal needs to be carried into the interference graph.** 
+
+Once we have produced this interference graph, we need to find the least number of colours which can be mapped to this graph, using graph colouring. Then we assign this value as K, the number of physical registers that we need.
+
+####Top-Down Colouring
+
+* Rank the live ranges.
+ * possible ways of ranking: number of neighbours, spill cost, etc.
+* Following the ranking to assign colours.
+* If a live range cannot be coloured, then spill (store after definition, then load before each use) or split the live range.
+
+####Bottom-Up Colouring
+
+What really changes here is how we are going to assign the colours. There are some advantages to using this approach in practical scenarios.
+
+We have a simple graph with only five nodes. We are trying to colour this with three colours. (See lecture slides).
+
+1. Simplifying the graph
+	* Pick any node, such that the number of neighbouring nodes is less than k (degree of the node), and put it on the stack.
+	* Remove that node and all edges incident to it.
+2. If the graph is non-empty (i.e., all nodes have k or more neighbours), then:
+	* Use some heuristic to spill a live range; remove corresponding node; if this causes some neighbours to have fewer than k nodes goto step 1, otherwise repeat step 2.
+3. Successively pop nodes off the stack and colour them using the first colour not used by some neighbour.
+	* If a node cannot be coloured, leave it uncoloured (will have to spill).
+
+(Observation: A graph having a node n with degree < k is k-colour-able iff the graph with node n removed is k-colour-able)
+
+####Global Register Allocation via Graph Colouring
+
+The idea: Live ranges that do not interfere can share the same registers.
+
+The algorithm:
+1. Construct global live ranges.
+2. Build interference graph.
+3. (try to) construct a k-colouring of the graph:
+	* If unsuccessful, choose values to spill (on the basis of some cost estimates in each case) and repeat from start (spill placement becomes a critical issue).
+4. Map colours onto physical registers.
+
+
+####Considering Live Ranges
+
+**LIVEIN and LIVEOUT**
+
+* LIVEIN: LIVEIN(b): a value is in LIVEIN if it is defined along some path through the control-flow graph that leads to b and it is either used directly in b or it is in LIVEOUT(b).
+* LIVEOUT: LIVEOUT(b): a value is in LIVEOUT if it is used along some path leaving b before being redefined, and it is either defined in b or is in LIVEIN(b).
+
+Constructing a control flow diagram:
+* first BB and last BB LIVEIN and LIVEOUT respectively is the empty set.
+* If basic block has no successors, LIVEOUT(b) = empty.
+* For all other basic blocks: LIVEOUT(b)= LIVEIN(s) for all immediate successors, s, of b in the control flow graph.
+* A value is in LIVEIN(b):
+	* if it is used before it is defined (if it is defined) in basic block b; or
+	* it is not used, nor defined, but it is in LIVEOUT(b).
+
+####Building the Interference graph
+
+	for each basic block b
+		LIVENOW(b)<-LIVEOUT(b)
+		for each operation in b (in reverse order) of the type op lr1,lr2,lr3:
+			for each live_range in LIVENOW(b) except lr2 and lr3:
+				add an edge between live_range and lr1
+			remove lr1 from LIVENOW(b)
+			add lr2 and lr3 to LIVENOW(b)
+
+
+##Lecture Eighteen: Instruction Scheduling
+
+* The problem:
+	* Given a code fragment for some target machine and the latencies for each individual operation, reorder operations to minimise execution time.
+	* Recall: modern processors may have multiple functional units.
+* The task:
+	* Produce correct code; minimise wasted cycles; avoid spilling registers; operate efficiently.
+
+Using instruction scheduling, we're trying to separate independent code blokes and which improves performance on machines with instruction pipelines. We're trying to:
+* Avoid pipeline stalls by rearranging the order of instructions.
+* Avoid illegal or semantically ambiguous operations (typically involving subtle instruction pipeline timing issues or non-interlocked resources.)
+
+####Background
+
+* Some operations have delay latency for execution. For example, loads and stores.
+
+**Overview of a solution:**
+
+Move loads back at least delay slots from where they are needed, but this increases register pressure (more registers may be needed) - recall the example in lecture 14 (slide 7).
+
+Ideally, we want to minimise both hardware stalls and added register pressure.
+
+If we have instructions that have a high latency, prioritise them, so we can overlap them in the processor pipeline, this allows us to overlap cycles, so essentially we're saving cycles.
+
+Example: **(a+b) + c**
+
+	LOAD r1, @a
+	LOAD r2, @b
+	ADD  r1, r1, r2
+	LOAD r3, @c
+	ADD  r1, r1, r3
+
+Assuming loads are 3 cycles and adds are one cycle, we're going to have 9 cycles for this code, because the first two loads overlap in the pipline, so by the time we're at the first ADD instruction, we have processed four cycles. Then ADD is one cycle, that's five cycles, then another LOAD is three more cycles, that's eight cycles, then we had to STALL at this point, so we waited until r3 was loaded, then performed the ADD which was one more cycle = **9 cycles**. WHERE AS, the exact same can be done by:
+
+	LOAD r1, @a
+	LOAD r2, @b
+	LOAD r3, @c
+	ADD  r1, r1, r2
+	ADD  r1, r1, r3
+
+Here, the first three loads are overlapped in the pipeline, so in total we have FOUR (I know this seems weird at first, but it's because r1 and r2 have both been loaded in 4 cycles, and since ADD r1, r1, r2 DOES NOT depend on r3, we don't have to wait for r3 to be loaded, so we can execute the instruction after 4 cycles) cycles before we can execute the first add instruction. Then by the fifth cycle, r3 has it's value loaded and it's possible to perform the final ADD instruction, so in total this code, that does the exact same thing, will only take = **6 cycles**.
+
+It makes sense to execute the things with the longest latencies first.
+
+####Algorithmic Method
+
+1. Build a precedence (data dependence) graph. (easy enough)
+2. Compute a priority function for the nodes of the graph - we decide this.
+3. Use list scheduling to construct, one cycle at a time:
+	1. Use a queue of operations that are ready:
+	2. At each cycle:
+		1. Choose a ready operation and schedule it.
+		2. update the ready queue.
+
+This is just a heuristic. But it gives good results.
+
+**Priority Function**
+
+Assign to each node a weight equal to the longest delay latency (total) to reach a leaf in the graph from this node (include latency of current node).
+
+weight_ i = latencyi + max(weight_all successor nodes)
+
+*Do examples to get to understand this*
+
+The higher the weight, the higher the importance to start with *this* instruction.
+
+**Remember to READ THE QUESTION - if it says it can do two instructions per cycle, then it can do two instructions per cycle!!!!**
+
+**Local List Scheduling**
+
+	Cycle=1; Ready=set of available operations; Active={}
+	While (Ready U Active != {})
+		if (Ready!={}) then
+			remove an op from Ready (based on the weight)
+			schedule(op)=cycle
+			Active=Active U op
+		cycle=cycle+1
+		for each op in Active
+			if (schedule(op)+delay(op)<=cycle) then
+				remove op from Active
+				for each immediate successor s of op
+					if (all operand of s are available) then
+						Ready=Ready U s
+
+This is forward list scheduling: start with all available operations; work forward in time (Ready: all operands available).
+
+It is possible to do list scheduling in a backwards fashion: start with leaves; work backward in time (Ready: latency covers uses).
+
+These two paradigms don't necessarily give the same outcome, so probably best to try both and keep the best result.
+
+**Variations on computing priority function: (READ UP ON THESE FOR EXAM - COULD BE IN THERE)**
+* Maximum path length containing node (decreases register usage).
+* Prioritise critical path.
+* Number of immediate successors or total number of descendants.
+* Increment weight if node contains a last use (shortens live ranges)
+* Do not add latency to node’s weight.
+* Maximum delay latency from first available node.
+
+**Instruction Scheduling interferes with Register Usage**
+
+The more number of registers we use, the easier it becomes for instruction scheduling because there are fewer dependencies. If we try and use as few registers as possible, then we create more dependencies.
+
+####Multiple Functional Units
+
+* Modern architectures can run operations in parallel.
+* List scheduling needs to be modified so that it can schedule as many operations per cycle as functional units (assuming that there are instructions available).
+
+**THIS IS IMPORTANT IS IS INCLUDED IN THE EXAM - SEE PAPER 2014 for list scheduling question, two instructions are executed simultaneously using multiple functional units, usually have more NOP instructions**
+
+As we increase the number of functional units, we're probably going to get more NOPS, so is it worth it? Depends on program an the architecture.
+
+**It's also important in exercises where there are more than one functional units that we cannot run two instructions at the beginning because there are usually dependencies - see last but one lecture slide**
+
+Optimisation can be based on multiple different things:
+* optimising for power consumption (mobile devices).
+* optimising for execution (number of cycles).
+* optimising for size of the code.
+
+##Lecture Nineteen: Code Optimisation
+
+<INSERT NOTES HERE> - LAST LECTURE! ALMOST THERE...!!
+
+##Twenty: Additional Notes for Exam
+
+Questions I'm likely to answer:
+1. DFA / NFA Question
+2. Question on live ranges and graph colouring
+3. Humm.......... Not sure!
+
+**Need to go over these particular topics in detail!**
 
 #References
 1. Rizos Sakellariou (2015), Compilers Lecture Slides, University of Manchester.
 2. James Power (2002), Parsing Lecture Notes, National University of Ireland, Maynooth.
+3. Wikipedia (2015), Instruction Scheduling, http://en.wikipedia.org/wiki/Instruction_scheduling
