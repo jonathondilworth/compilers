@@ -19,6 +19,7 @@ Going to be making my notes in this markdown file, plus also maybe throwing some
 13. Lecture Thirteen: Procedure Abstraction, Run-Time Storage Organisation
 14. Lecture Fourteen: Exercise Examples
 15. Lecture Fifteen: Code Generation - Instruction Selection
+16. Lecture Sixteen: Register Allocation
 
 
 ##Lecture One: Introduction
@@ -694,6 +695,62 @@ Here, the LOAD instructions can be overlapped (remember the pipeline for OS year
 **Principal, do the things which have a higher latency as early as possible.**
 
 && and || operators, compilers will only evaluate one part (X) of the code and if it's false for an if(X && Y), because it's just wasted cycles.
+
+##Lecture Sixteen: Register Allocation
+
+* Assume RISC-like type of code.
+* Makes use of **virtual registers** (virtual memory) - even though there are a limited number of **physical registers**.
+* What is trying to be accomplished:
+  * Produce correct K register code.
+  * Minimise number of loads and stores (spill code) and their space.
+  * The allocator must be efficient (no backtracking).
+
+####Background
+
+* Basic Block: Maximal length segment of straight line code.
+* Local register allocation: within a single block.
+* Global register allocation: across an entire procedure (multiple blocks).
+* Allocation: choose what to keep in registers.
+* Assignment: choose specific registers for values.
+* Complexity: we need good heuristics, GOOD heuristics that are GOOD ENOUGH.
+
+####Liveness and Live Ranges
+
+Efficiently choosing which registers to allocate values to. The liveness is between definition and the last use before it is redefined. Live range is from variable definition to last use.
+
+over all instructions in the basic block:
+MAXLIVE is the maximum number of values live at an instruction, K.
+if MAXLIVE <= k, then allocate is trivial.
+if MAXLIVE > k, then values must be spilled into memory.
+
+Live range: definition until the last time it is used. Applies to assembly and all programmes in any language.
+
+When we're doing register allocation, we may decide that one live range is optimal 
+
+If we are in a position where one live range starts at the end of another live range, we can subtract one from the live range, since it is possible to share registers (see lecture slide Example / Exercise 13-Apr). But all that matters in the exam, to be consistent.
+
+**LIVE RANGES IS AN IMPORTANT CONCEPT IN REGISTER ALLOCATION - ALWAYS POPS UP IN EXAM, MAKE SURE YOU CAN CALCULATE IT**
+
+####Register Allocation Schemes
+
+#####Top Down (Local) Register Allocation
+
+if we have 10 values, and only 5 registers on the processor (number of values to be stored > numbers of registers), we use two registers to transfer to and from memory. Using three registers, get the values that are used most often (most commonly used) and for the remaining 7 values, load and store from and to the memory when we need them.
+
+Problem: what if the most commonly used values are only just used in the first half of the basic block, or they are just used in the second half of the basic block? It's not very efficient. Or perhaps, they are only just more commonly used than the other values.
+
+#####Another Naive Approach
+
+Load the most commonly used value into a register and use the remaining registers as needed. We have a pool of registers, and in this pool of registers, we strictly go with the live ranges.
+
+Instruction 1: Get one from the pool.
+Instruction 2: Get one from the pool...
+...
+Instruction 6: A live range terminates, return this register to the pool..
+Instruction 7: A live range terminates, return this register to the pool..
+
+If at some point the pool is empty, then try to store to the main memory, the register that is going to be used the furtherest in the future, because we don't need this register for quite a while.
+
 
 #References
 1. Rizos Sakellariou (2015), Compilers Lecture Slides, University of Manchester.
