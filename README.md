@@ -1063,6 +1063,81 @@ Questions I'm likely to answer:
 
 **Need to go over these particular topics in detail!**
 
+####2014 exam paper
+
+Ties between weighted nodes (last question): two evaluation methods
+* number of successor nodes
+* randomly do it
+* specify your own objective function which aims to minimise something such as:
+	* power consumption
+	* size of code ??
+
+####2008 exam paper
+
+assumption: extend basic block by loop unrolling,
+assumption 
+Optimisation: each iteration creates an overhead, larger basic blocks = less overhead, because in low level code, we're doing less branching.
+
+####IMPORTANT
+
+**CODE OPTIMISATION VIA INLINING:**
+
+By increasing the size of a basic block, we're reducing the overheads associated with branching or looping, but we're also enabling several optimisations (larger blocks are good for instruction scheduling, etc). In a language such as Java instance / virtual methods exist where the compiler may not be able to tell which method is being in-lined and ALSO recursive methods (methods that call themselves) cannot be in-lined.
+
+**TOP DOWN ALLOCATION:** Evaluates most commonly used registers and allocates certain registers for spilling (reading and writing from main memory) based on the number of functional units in the processor.
+
+**BOTTOM UP ALLOCATION (BESTS ALGORITHM)**: Best’s algorithm can be used to ensure that for each operation the operands are already in a physical register (if they aren’t, a physical register is allocated) – if they are not needed after the operation they are freed. As for the left hand side of the operation, a free register or the one used the farthest in the future is used (in which case, the current value will have to be spilled to the memory).
+
+BASICALLY: make a live range graph and don't use the -1's, just use the registers that are definatly available. This is how the model answers do it.
+
+**Interference Graph:** Live ranges represented as nodes, any live ranges that overlap, connect them by an edge.
+
+**Colouring the Interference Graph:**
+* Top down colouring: Rank the Live Ranges (nodes - ranking: number of neighbours, spill cost, etc).
+* Bottom up colouring (Chaitains Algorithm):
+	1. simply graph
+	2. if graph is non empty (all nodes have k or more neighbours), use some heuristic to spill a live range.
+	3. successively pop nodes off graph, colour using some colour not used by neighbours.
+
+IN SIMPLE LANGUAGE: select node with least edges, push onto stack. continue to simplify graph by selecting least edges and push onto stack until stack is completely unconnected. Then pop off stack and colour, as long as not colour of neighbour.
+
+**QUESTION ONE**
+
+ACCESS LINKS = Non-Local Addressability.
+DEPENDENCE VECTOR = Code Optimisation
+SHIFT REDUCE CONFLICT = bottom up parsing
+STACK MACHINE CODE = JVM
+
+(answers I got wrong)..
+
+**ON AUTOMATON QUESTION**
+
+If we're asked to generate a regular expression where we're using DIGIT, make sure the first isn't a zero / empty, i.e:
+
+digit digit digit digit, is only >= 1000 IFF the first digit [digit()] != 0.
+
+**WARNING: THIS IS A DIFFERENCE BETWEEN A CALL GRAPH AND A CONTROL FLOW GRAPH**
+
+call graphs are simpler.
+
+#### OPTMISATIONS
+
+* Common subexpression elimination: searches for instances of identical expressions (i.e., they all evaluate to the same value), and analyses whether it is worthwhile replacing them with a single variable holding the computed value.
+* Copy propagation: from a programmers point of view, it might be a good idea to implement two different variables for two separate purposes, that contain the same value, because it is sensical for maintenance. From a compilers point of view, there is no point, its a waste, because variables take registers, take space in memory, etc. We can not both using both variables, we just use one and propagate it as far as it is un-changed in the programme.
+* Constant propagation: *Don't really get this.. constants should never change anyway?*
+* Constant folding: compiler can compute literals such as 5*3+8-12/2 at compilation time, rather than run-time.
+* Dead-code elimination: code that is redundant or is never going to be executed:
+
+
+##TODO-Tomorrow-Before-Exam:
+* Learn Optimisations
+* go over list scheduling question (2012 - last question)
+* Thompson's Construction
+* Register Allocation VS Register Assignment
+* Go over all important notes
+
+
+
 #References
 1. Rizos Sakellariou (2015), Compilers Lecture Slides, University of Manchester.
 2. James Power (2002), Parsing Lecture Notes, National University of Ireland, Maynooth.
